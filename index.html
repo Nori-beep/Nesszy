@@ -1,0 +1,890 @@
+```html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nori Design - รับทำป้าย สติกเกอร์ ดึงเข้ากลุ่ม</title>
+    
+    <!-- นำเข้าฟอนต์ Prompt จาก Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           กำหนดตัวแปรสีจากพาเลท (Nori Design)
+           ========================================= */
+        :root {
+            --color-cream: #FBF1ED;
+            --color-nude-red: #A6575B;
+            --color-wine-red: #7E3136;
+            --color-white: #FFFFFF;
+            --color-text-dark: #3A1A1C;
+            --color-text-muted: #8A6D6E;
+        }
+
+        /* =========================================
+           Reset & Base Styles
+           ========================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            color: var(--color-text-dark);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            background-color: transparent;
+        }
+
+        /* =========================================
+           Ambient Background (ลูกเล่นแสงออร่าพื้นหลัง)
+           ========================================= */
+        .ambient-bg {
+            position: fixed;
+            top: 0; 
+            left: 0;
+            width: 100vw; 
+            height: 100vh;
+            z-index: -5;
+            background-color: var(--color-cream);
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .ambient-noise {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            z-index: 2;
+        }
+
+        .glow-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 1;
+            opacity: 0.35;
+            animation: floatGlow 20s infinite ease-in-out alternate;
+        }
+
+        .glow-1 {
+            width: 50vw; height: 50vw;
+            background-color: var(--color-nude-red);
+            top: -10%; left: -10%;
+            animation-duration: 25s;
+        }
+
+        .glow-2 {
+            width: 60vw; height: 60vw;
+            background-color: var(--color-wine-red);
+            bottom: -20%; right: -10%;
+            opacity: 0.25;
+            animation-duration: 30s;
+            animation-direction: alternate-reverse;
+        }
+
+        .glow-3 {
+            width: 45vw; height: 45vw;
+            background-color: #E6A2A6;
+            top: 30%; left: 40%;
+            opacity: 0.25;
+            animation-duration: 35s;
+        }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(8vw, 10vh) scale(1.1); }
+            66% { transform: translate(-5vw, -8vh) scale(0.95); }
+            100% { transform: translate(10vw, 5vh) scale(1.05); }
+        }
+
+        /* =========================================
+           Sparkle Effects (ลูกเล่นอิโมจิวิ้งๆ)
+           ========================================= */
+        .sparkle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+            overflow: hidden;
+        }
+        
+        .sparkle {
+            position: absolute;
+            opacity: 0;
+            user-select: none;
+            animation: floatSparkle linear infinite;
+        }
+        
+        @keyframes floatSparkle {
+            0% { opacity: 0; transform: translateY(0) scale(0.5) rotate(0deg); }
+            50% { opacity: 0.8; transform: translateY(-30px) scale(1.2) rotate(20deg); }
+            100% { opacity: 0; transform: translateY(-60px) scale(0.5) rotate(45deg); }
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* =========================================
+           Animations (ลูกเล่นเลื่อน)
+           ========================================= */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+
+        @keyframes rotateSlowly {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 4px var(--color-white), 0 0 0 5px var(--color-nude-red), 0 10px 20px rgba(126, 49, 54, 0.1); }
+            50% { box-shadow: 0 0 0 4px var(--color-white), 0 0 0 7px var(--color-nude-red), 0 15px 30px rgba(126, 49, 54, 0.25); }
+            100% { box-shadow: 0 0 0 4px var(--color-white), 0 0 0 5px var(--color-nude-red), 0 10px 20px rgba(126, 49, 54, 0.1); }
+        }
+
+        /* =========================================
+           Layout Components
+           ========================================= */
+        
+        /* แถบประกาศ */
+        .announcement-bar {
+            background-color: var(--color-wine-red);
+            color: var(--color-white);
+            text-align: center;
+            padding: 10px 15px;
+            font-size: 0.85rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* วิดีโอส่วนหัว */
+        .hero-media {
+            width: 100%;
+            height: 300px;
+            background-color: rgba(166, 87, 91, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* โลโก้และชื่อร้าน */
+        .brand-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: -65px; 
+            position: relative;
+            z-index: 10;
+            padding-bottom: 1rem;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-placeholder {
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-white);
+            border-radius: 50%;
+            border: 1px solid var(--color-wine-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            animation: pulseGlow 4s infinite ease-in-out;
+            background-image: url('https://i.postimg.cc/Hsj59b0Q/pr-bch-d.jpg'); 
+            background-size: cover; 
+            background-position: center;
+        }
+
+        .curved-decorations {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            z-index: 1;
+            pointer-events: none;
+            animation: rotateSlowly 25s linear infinite;
+        }
+
+        /* คำโปรย */
+        .slogan-section {
+            padding: 1rem 2rem 3rem;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .slogan-box {
+            padding: 2rem 1.5rem;
+            position: relative;
+        }
+
+        .slogan-box::before, .slogan-box::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 1px;
+            background-color: var(--color-nude-red);
+            transition: width 1.5s ease 0.5s;
+        }
+        .reveal.active .slogan-box::before, 
+        .reveal.active .slogan-box::after {
+            width: 80px;
+        }
+        .slogan-box::before { top: 0; }
+        .slogan-box::after { bottom: 0; }
+
+        .slogan-text {
+            font-size: 1.3rem;
+            color: var(--color-wine-red);
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        /* หัวข้อ Section */
+        .section-title {
+            text-align: center;
+            color: var(--color-wine-red);
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        /* บริการและราคา (Grid) */
+        .services-container {
+            padding: 0 20px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .service-card {
+            background-color: var(--color-white);
+            border: 2px dashed rgba(166, 87, 91, 0.35);
+            border-radius: 24px;
+            padding: 25px 15px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(126, 49, 54, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '✿';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: rgba(166, 87, 91, 0.1);
+            font-size: 1.2rem;
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px) rotate(1.5deg);
+            box-shadow: 0 15px 30px rgba(126, 49, 54, 0.1);
+            border-color: var(--color-nude-red);
+            background-color: #FFF9F9;
+        }
+
+        .service-card:hover::before {
+            transform: rotate(90deg);
+            color: rgba(166, 87, 91, 0.3);
+        }
+
+        .service-icon {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            transition: transform 0.3s ease;
+        }
+        
+        .service-card:hover .service-icon {
+            transform: scale(1.15) rotate(-5deg);
+        }
+
+        .service-title {
+            color: var(--color-wine-red);
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .service-price {
+            color: var(--color-nude-red);
+            font-size: 1.2rem;
+            font-weight: 600;
+            background-color: rgba(166, 87, 91, 0.08);
+            padding: 4px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .service-desc {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        /* ลิงก์กลุ่มต่างๆ */
+        .groups-section {
+            padding: 0 20px 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .group-category {
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 25px 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(166, 87, 91, 0.15);
+        }
+
+        .group-category h4 {
+            text-align: center;
+            color: var(--color-wine-red);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .group-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .group-btn {
+            background-color: var(--color-white);
+            color: var(--color-text-dark);
+            border: 1px solid var(--color-nude-red);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            white-space: nowrap;
+        }
+
+        .group-btn:hover {
+            background-color: var(--color-nude-red);
+            color: var(--color-white);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(166, 87, 91, 0.2);
+        }
+
+        .group-btn.recommend {
+            background-color: rgba(166, 87, 91, 0.1);
+            border-color: var(--color-wine-red);
+            color: var(--color-wine-red);
+            font-weight: 500;
+        }
+        .group-btn.recommend:hover {
+            background-color: var(--color-wine-red);
+            color: var(--color-white);
+        }
+
+        /* ข้อมูลร้าน (กติกา กฎ) */
+        .info-section {
+            padding: 0 20px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .info-box {
+            background-color: var(--color-white);
+            border-left: 4px solid var(--color-nude-red);
+            padding: 25px;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 0 8px 25px rgba(126, 49, 54, 0.05);
+        }
+
+        .info-box h4 {
+            color: var(--color-wine-red);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            color: var(--color-text-dark);
+        }
+
+        .info-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--color-nude-red);
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .info-list li span {
+            color: var(--color-nude-red);
+            font-weight: 500;
+        }
+
+        /* ปุ่มติดต่อและผลงาน (Footer) */
+        .action-section {
+            padding: 0 20px 60px;
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .btn-main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 10px;
+            border-radius: 24px;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-height: 130px;
+            line-height: 1.4;
+        }
+
+        .btn-icon {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-main:hover {
+            transform: translateY(-8px) rotate(-1.5deg);
+        }
+
+        .btn-main:hover .btn-icon {
+            transform: scale(1.15) rotate(8deg);
+        }
+
+        .btn-facebook {
+            background-color: var(--color-wine-red);
+            color: var(--color-white);
+            box-shadow: 0 8px 20px rgba(126, 49, 54, 0.2);
+            border: 2px solid var(--color-wine-red);
+        }
+        .btn-facebook:hover {
+            background-color: #5a2226;
+            border-color: #5a2226;
+            transform: translateY(-8px) rotate(1.5deg);
+            box-shadow: 0 15px 30px rgba(126, 49, 54, 0.3);
+        }
+
+        .btn-portfolio {
+            background-color: var(--color-white);
+            color: var(--color-wine-red);
+            border: 2px dashed rgba(166, 87, 91, 0.35);
+            box-shadow: 0 8px 20px rgba(126, 49, 54, 0.05);
+        }
+        .btn-portfolio:hover {
+            border-color: var(--color-nude-red);
+            background-color: #FFF9F9;
+        }
+
+        /* =========================================
+           Music Player Button (ปุ่มเปิด-ปิดเพลง)
+           ========================================= */
+        .music-toggle {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--color-white);
+            border: 2px solid var(--color-nude-red);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(126, 49, 54, 0.15);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .music-toggle:hover {
+            transform: scale(1.1) rotate(-10deg);
+            background-color: #FFF9F9;
+        }
+
+        .music-playing {
+            animation: rotateSlowly 4s linear infinite;
+            border-color: var(--color-wine-red);
+            box-shadow: 0 5px 20px rgba(126, 49, 54, 0.3);
+        }
+
+        /* =========================================
+           Responsive Design
+           ========================================= */
+        @media (max-width: 480px) {
+            .grid-layout { gap: 12px; }
+            .service-card { padding: 20px 10px; border-radius: 20px; }
+            .service-icon { font-size: 1.8rem; margin-bottom: 8px; }
+            .service-title { font-size: 0.95rem; }
+            .service-price { font-size: 1rem; padding: 3px 10px; }
+            .service-desc { font-size: 0.75rem; }
+            .service-card::before { font-size: 1rem; top: 8px; right: 12px; }
+            
+            .action-section { grid-template-columns: repeat(2, 1fr); }
+            .btn-main { min-height: 110px; padding: 15px 5px; font-size: 0.85rem; border-radius: 20px; }
+            .btn-icon { font-size: 1.8rem; }
+            .btn-facebook { grid-column: 1 / -1; }
+        }
+
+        @media (min-width: 768px) {
+            .hero-media { height: 400px; }
+            .brand-section { margin-top: -80px; }
+            .logo-wrapper { width: 150px; height: 150px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- พื้นหลังลูกเล่นแสง (Ambient Glow) -->
+    <div class="ambient-bg">
+        <div class="ambient-noise"></div>
+        <div class="glow-blob glow-1"></div>
+        <div class="glow-blob glow-2"></div>
+        <div class="glow-blob glow-3"></div>
+    </div>
+
+    <!-- แถบประกาศ -->
+    <div class="announcement-bar">
+        🌻 ยินดีต้อนรับเข้าสู้ร้านโนริค่า สอบถามได้นะคะ มีสะสมแต้ม 🌻
+    </div>
+
+    <!-- ส่วนหัว (Hero) วิดีโอ -->
+    <div class="hero-media">
+        <!-- ใส่ลิงก์วิดีโอของคุณได้ตรง src="banner.mp4" -->
+        <video class="hero-video reveal active" autoplay loop muted playsinline>
+            <source src="banner.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- โลโก้ และ ชื่อร้าน -->
+    <div class="brand-section">
+        <div class="logo-wrapper reveal active">
+            <div class="logo-placeholder"></div>
+            
+            <svg class="curved-decorations" viewBox="0 0 200 200" aria-hidden="true">
+                <path id="text-path" d="M 35 125 A 70 70 0 0 0 165 125" fill="transparent" />
+                <text fill="var(--color-wine-red)" font-family="'Prompt', sans-serif" font-weight="500" font-size="18" letter-spacing="2">
+                    <textPath href="#text-path" startOffset="50%" text-anchor="middle">
+                        Nori Design
+                    </textPath>
+                </text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- คำโปรย -->
+    <div class="slogan-section reveal">
+        <div class="slogan-box">
+            <h2 class="slogan-text">
+                🌻ร้านโนริพร้อมให้บริการค่า<br>
+                ส่องให้อิน ไว้ใจทางร้านค่อยมาแวะน้า🌻<br>
+                🌈พร้อมให้บริการลูกค้าน่ารักๆทุกท่าน💗
+            </h2>
+        </div>
+    </div>
+
+    <!-- บริการและราคา -->
+    <div class="services-container">
+        <h3 class="section-title reveal">🎨 เรทราคางานที่รับทำ</h3>
+        <div class="grid-layout">
+            
+            <div class="service-card reveal">
+                <div class="service-icon">🪄</div>
+                <h4 class="service-title">งานป้าย</h4>
+                <div class="service-price">เริ่มต้น 89.-</div>
+            </div>
+
+            <div class="service-card reveal delay-1">
+                <div class="service-icon">💬</div>
+                <h4 class="service-title">สติกเกอร์แชท / ไอจี</h4>
+                <div class="service-price">เริ่มต้น 59.-</div>
+            </div>
+
+            <div class="service-card reveal delay-2">
+                <div class="service-icon">🐻</div>
+                <h4 class="service-title">สติกเกอร์ไลน์</h4>
+                <div class="service-desc">รูปตัวเอง / ลูก / อื่นๆ</div>
+                <div class="service-price">เริ่มต้น 189.-</div>
+            </div>
+
+            <div class="service-card reveal delay-3">
+                <div class="service-icon">💻</div>
+                <h4 class="service-title">ทำเว็บร้านค้า</h4>
+                <div class="service-price">เริ่มต้น 129.-</div>
+            </div>
+
+            <!-- แบนเนอร์จุดเช็คคิว -->
+            <a href="https://ksm-bb.github.io/Nori-Design/" target="_blank" class="reveal" style="grid-column: 1 / -1; display: block; max-width: 450px; margin: 0 auto; border-radius: 24px; overflow: hidden; box-shadow: 0 8px 20px rgba(126, 49, 54, 0.05); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);" onmouseover="this.style.transform='translateY(-5px) scale(1.02)'; this.style.boxShadow='0 15px 30px rgba(126, 49, 54, 0.15)';" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 8px 20px rgba(126, 49, 54, 0.05)';">
+                <img src="https://i.postimg.cc/qMSxS1QF/IMG-1340.jpg" alt="จุดเช็คคิวร้านโนริ" style="width: 100%; display: block; object-fit: cover;">
+            </a>
+
+        </div>
+    </div>
+
+    <!-- รวมกลุ่มต่างๆ -->
+    <div class="groups-section">
+        
+        <div class="group-category reveal">
+            <h4>🌻 รวมกลุ่มที่ดึงเมลเอง</h4>
+            <div class="group-grid">
+                <a href="https://drive.google.com/drive/folders/1YKwLAZogYhZKBWPBxGKTGVwzR3zcEDel" target="_blank" class="group-btn">เส้นปะ</a>
+                <a href="https://drive.google.com/drive/folders/1Ye9suMpDDivZ45bzRfnQ0f-o1w0dEHvQ" target="_blank" class="group-btn">INKY GROUP</a>
+                <a href="https://drive.google.com/drive/folders/1EHSj38mZ9XxLsmS1WXyrjTIOsl7sjGQK" target="_blank" class="group-btn">ลายเส้น Belinda</a>
+                <a href="https://drive.google.com/drive/folders/1fItAncfAu3g91k6dYNnX7EEihn3dj4kS" target="_blank" class="group-btn">Still drawing v1</a>
+                <a href="https://drive.google.com/drive/folders/1V9U2f1Z9HHZmFqVR5H_H_XRo-VF-D6T5" target="_blank" class="group-btn">Still drawing v2</a>
+                <a href="https://drive.google.com/drive/folders/1EdZHXv2yzinG1-fCTeszo4IFTcEwBN1t" target="_blank" class="group-btn">Merita</a>
+                <a href="https://drive.google.com/drive/folders/1NdbzjMsB3Le66YlvXCWt6ywZI18__sVk" target="_blank" class="group-btn">Calista</a>
+                <a href="https://drive.google.com/drive/folders/117KeqfEJU-VrfHPzpAPDeNT62nvaPB7a" target="_blank" class="group-btn">Jamille</a>
+                <a href="https://drive.google.com/drive/folders/1drtqFx3YBzHjnrjt-BrzdZm5FFlyBCKW" target="_blank" class="group-btn">Pancake</a>
+                <a href="https://drive.google.com/drive/folders/1lWfTHqAbVoZH2YveT70TO5pmfiikwY3G" target="_blank" class="group-btn">Queen pop</a>
+                <a href="https://drive.google.com/drive/folders/1ijU1i-CNAZgKTul6lmiN6VIDsPwVU2sd" target="_blank" class="group-btn">Hormony</a>
+                <a href="https://drive.google.com/drive/folders/1pgnqUzdmjW7vK0s_fNCV0SY6-S-FHOzp" target="_blank" class="group-btn">Moonie</a>
+                <a href="https://drive.google.com/drive/folders/1LaYCivILFAjqKgnzTMJJ5RlRXZgB9YWf" target="_blank" class="group-btn">Fusion</a>
+                <a href="https://drive.google.com/drive/folders/1CrGdw6jr_cYcRr2LXKq_yhrkMvna8fVX" target="_blank" class="group-btn">kawaii Fuji</a>
+                <a href="https://drive.google.com/drive/folders/13zR7r66v8hO-rD2t6LahxD1f9Mc8J1Ue" target="_blank" class="group-btn">Teaching group</a>
+                <a href="https://drive.google.com/drive/folders/1d6IxpNl4zajE7XP-W2KJ17wkGPkG11uj" target="_blank" class="group-btn">Mitarashi</a>
+                <a href="https://drive.google.com/drive/folders/1cV7jkDmRh1VD-nD_I-VDsW__zUzSFYYQ" target="_blank" class="group-btn">Jainoy</a>
+                <a href="https://drive.google.com/drive/folders/1skKUNZSFr1cE_PQwmk5dG-26zjnaRq9J" target="_blank" class="group-btn">ฟุคุเนโกะ</a>
+                <a href="https://drive.google.com/drive/folders/1KE9lcHUTP5sS8csxiCD9shzwH3dW9gzV" target="_blank" class="group-btn">Glitter magic</a>
+                <a href="https://drive.google.com/drive/folders/1Ufh9MFi49FBX00bPe05pXAtlWMdG3-0k" target="_blank" class="group-btn">แมวดำ</a>
+                <a href="https://drive.google.com/drive/folders/1_szs-_HaCJMy6hBb7N4_dDVzZW4jkQoS" target="_blank" class="group-btn">Jellybunnie v2</a>
+                <a href="https://drive.google.com/drive/folders/1QGC5IfTfafn6s0OFwhW17p92fwpAs2fx" target="_blank" class="group-btn">Jellybunnie v1</a>
+                <a href="https://drive.google.com/drive/folders/10YI5_ZXufqnMh896HnB2Z6LD888Imh-0" target="_blank" class="group-btn">นุบนิบบรัช</a>
+                <a href="https://drive.google.com/drive/folders/1mDzXfPna4LjDyzU8jRJT9-LQykywM1YZ" target="_blank" class="group-btn">Trick sticker by nes</a>
+                <a href="https://drive.google.com/drive/folders/1VG-NqauROtZhjzgYePtfd6TI3XsKry7f" target="_blank" class="group-btn">Sugar plum v1</a>
+                <a href="https://drive.google.com/drive/folders/1IhgsHW0niXL1P7TN-muEteDPSe7lPEwq" target="_blank" class="group-btn">Sugar plum v2</a>
+                <a href="https://drive.google.com/drive/folders/1-TTWSUqSELb80zXcnYaZaYxTyGRLio5W" target="_blank" class="group-btn">kuromi box</a>
+                <a href="https://drive.google.com/drive/folders/1g565WGi56qOg09APdgYthQPRZYHsQ9pf" target="_blank" class="group-btn">Little spark</a>
+                <a href="https://drive.google.com/drive/folders/1A5FC5j1dGakbow9ISiFywUSPOymAXPSW?usp=drive_link" target="_blank" class="group-btn">Vioer</a>
+                <a href="https://drive.google.com/drive/folders/1e8R2bs55n3ppm4cP-DTbp7PxPBZZLi2F" target="_blank" class="group-btn">Pikoro</a>
+            </div>
+        </div>
+
+        <div class="group-category reveal">
+            <h4>📍 กลุ่มที่แนะนำว่าต้องมี 🌈</h4>
+            <div class="group-grid">
+                <a href="https://drive.google.com/drive/folders/18wz_Hx9Iik7YGXZK4nOi8i2z1IdcZOg6" target="_blank" class="group-btn recommend">Serabies</a>
+                <a href="https://shorturl.asia/zVTa9" target="_blank" class="group-btn recommend">Rosella</a>
+                <a href="https://drive.google.com/drive/folders/1O5mfoZTg1Ecoh99PsIz3EEgAWvAWUc0Q" target="_blank" class="group-btn recommend">Kelbies v1</a>
+                <a href="https://drive.google.com/drive/folders/1v7GevdSytdczmDmOlQ7tF3AEOunTHqBc" target="_blank" class="group-btn recommend">Kelbies v2</a>
+                <a href="https://drive.google.com/drive/folders/1ymzwaJGDlrMyp7JJB9kkJMl4bH8utyz7" target="_blank" class="group-btn recommend">Kellynori v1</a>
+                <a href="https://drive.google.com/drive/folders/1MJ9SuXIzyz3_alVFNA_HQ3oMULjRpQdQ" target="_blank" class="group-btn recommend">kellynori v2</a>
+                <a href="https://drive.google.com/drive/folders/1hiHUQv2oRy2SQCMefPAiKjR3iNjoPlyT" target="_blank" class="group-btn recommend">little baby</a>
+                <a href="https://drive.google.com/drive/folders/14RG7Br-1PVr8K76cb2gnQZgDacK6Hp6Q" target="_blank" class="group-btn recommend">miracle effect v1</a>
+                <a href="https://drive.google.com/drive/folders/11Pq2C3rt8CIBbhV7Pn-IXYmahdmjRR7n" target="_blank" class="group-btn recommend">miracle effect v2</a>
+                <a href="https://drive.google.com/drive/folders/1cgM-RKOiolqM8g8bH3AjN9GeEPyUxUYH" target="_blank" class="group-btn recommend">สอนวาดฮาวคิ้ว</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- กฎและขั้นตอน -->
+    <div class="info-section">
+        
+        <div class="info-box reveal">
+            <h4>📋 ขั้นตอนการเข้ากลุ่ม</h4>
+            <ul class="info-list">
+                <li>ดูตัวอย่างแล้ว <span>แคปรูปกลุ่มที่สนใจ</span> ทักเฟสได้เลย</li>
+                <li>รวมยอด โอนเงิน</li>
+                <li>รอดึงเข้ากลุ่มได้เลย</li>
+            </ul>
+        </div>
+
+        <div class="info-box reveal delay-1">
+            <h4>📋 เงื่อนไขงานป้าย / สติกเกอร์</h4>
+            <ul class="info-list">
+                <li>ตามปกติรองาน <span>1-2 วัน</span> แล้วแต่คิวของวันนั้นๆ</li>
+                <li>งานเร่ง <span>*2 ของราคา</span></li>
+                <li>งานเว็บรอประมาณ <span>4-8 ชั่วโมง</span> ของแต่ละคิว</li>
+            </ul>
+        </div>
+
+        <div class="info-box reveal delay-2">
+            <h4>📍 กฎของร้าน</h4>
+            <ul class="info-list">
+                <li>โอนเงินแล้ว <span>ไม่รับโอนคืนทุกกรณี</span></li>
+                <li>โอนผิดโอนเกิน ทางร้านไม่รับผิดชอบ</li>
+                <li>หากยกเลิกงานหลังส่งบรีฟมาแล้ว หรือหากงานเริ่มไปแล้วจะ <span>คืนแค่ 50%</span></li>
+                <li>หากยกเลิกหลังจากเช็คงาน = <span>ไม่คืนเงิน</span> และส่งงานให้ตามที่ทำเสร็จ</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- ปุ่มแอคชั่นด้านล่าง -->
+    <div class="action-section reveal delay-3">
+        <a href="https://linkbio.co/noridesign" target="_blank" class="btn-main btn-portfolio">
+            <div class="btn-icon">⭐️</div>
+            <span>ตัวอย่างกลุ่ม<br>ต่างๆ (Linkbio)</span>
+        </a>
+        <a href="https://drive.google.com/drive/folders/1ovnS1imBV8jKO-fCHfBhnd3NDw8Yl1lv" target="_blank" class="btn-main btn-portfolio">
+            <div class="btn-icon">🎨</div>
+            <span>ดูตัวอย่างงาน<br>ที่นี่</span>
+        </a>
+        <a href="https://www.facebook.com/nori.desing?" target="_blank" class="btn-main btn-facebook">
+            <div class="btn-icon">📱</div>
+            <span>ติดต่อสอบถาม<br>/ สั่งงาน</span>
+        </a>
+    </div>
+
+    <!-- ปุ่มเล่นเพลง -->
+    <audio id="bg-music" loop>
+        <!-- แก้ชื่อไฟล์เพลง .mp3 ตรงนี้ -->
+        <source src="bgm.mp3" type="audio/mpeg">
+    </audio>
+    <button id="music-btn" class="music-toggle" title="เล่น/หยุดเพลง">🔇</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const reveals = document.querySelectorAll('.reveal');
+            const revealOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+            const revealOnScroll = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, revealOptions);
+            reveals.forEach(reveal => revealOnScroll.observe(reveal));
+
+            // =========================================
+            // ระบบสร้างอิโมจิ ✨ วิ้งๆ แบบสุ่ม
+            // =========================================
+            const createSparkles = () => {
+                const container = document.createElement('div');
+                container.className = 'sparkle-container';
+                document.body.appendChild(container);
+
+                const sparkleCount = 25; 
+                
+                for (let i = 0; i < sparkleCount; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.innerHTML = '✨';
+                    
+                    sparkle.style.left = Math.random() * 100 + 'vw';
+                    sparkle.style.top = Math.random() * 100 + 'vh';
+                    sparkle.style.fontSize = (Math.random() * 1 + 0.6) + 'rem';
+                    sparkle.style.animationDuration = (Math.random() * 3 + 2.5) + 's'; 
+                    sparkle.style.animationDelay = (Math.random() * 5) + 's';
+                    
+                    container.appendChild(sparkle);
+                }
+            };
+            createSparkles();
+
+            // =========================================
+            // ระบบเปิด-ปิดเพลง
+            // =========================================
+            const bgMusic = document.getElementById('bg-music');
+            const musicBtn = document.getElementById('music-btn');
+            let isPlaying = false;
+
+            bgMusic.volume = 0.4; 
+
+            musicBtn.addEventListener('click', () => {
+                if (isPlaying) {
+                    bgMusic.pause();
+                    musicBtn.innerHTML = '🔇';
+                    musicBtn.classList.remove('music-playing');
+                } else {
+                    bgMusic.play().catch(e => console.log("Audio play failed:", e));
+                    musicBtn.innerHTML = '🎵';
+                    musicBtn.classList.add('music-playing');
+                }
+                isPlaying = !isPlaying;
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+```
