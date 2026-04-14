@@ -634,9 +634,11 @@
 
     <!-- ส่วนหัว (Hero) วิดีโอ -->
     <div class="hero-media">
-        <!-- ใส่ลิงก์วิดีโอของคุณได้ตรง src="banner.mp4" -->
-        <video class="hero-video reveal active" autoplay loop muted playsinline>
+        <!-- เพิ่ม webkit-playsinline, x5-playsinline, x5-video-player-type รองรับเบราว์เซอร์ในแอป เช่น LINE, FB, IG -->
+        <video class="hero-video reveal active" autoplay loop muted playsinline webkit-playsinline preload="auto" x5-playsinline x5-video-player-type="h5">
             <source src="banner.mp4" type="video/mp4">
+            <!-- ไฟล์สำรอง เผื่อบางเบราว์เซอร์ไม่รองรับ mp4 -->
+            <source src="banner.webm" type="video/webm">
         </video>
     </div>
 
@@ -811,9 +813,10 @@
     </div>
 
     <!-- ปุ่มเล่นเพลง -->
-    <audio id="bg-music" loop>
-        <!-- แก้ชื่อไฟล์เพลง .mp3 ตรงนี้ -->
+    <!-- เพิ่ม x5-audio-player-type รองรับเบราว์เซอร์ในแอปบางตัวให้รันไฟล์เสียงได้เนียนขึ้น -->
+    <audio id="bg-music" loop preload="auto" x5-audio-player-type="h5">
         <source src="bgm.mp3" type="audio/mpeg">
+        <source src="bgm.ogg" type="audio/ogg">
     </audio>
     <button id="music-btn" class="music-toggle" title="เล่น/หยุดเพลง">🔇</button>
 
