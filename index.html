@@ -1,520 +1,886 @@
-```html
+html
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nori Design - รับทำป้าย สติกเกอร์ ดึงเข้ากลุ่ม</title>
-    
-    <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
-    <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
-    <link href="[https://fonts.googleapis.com/css2?family=Prompt:wght@200;300;400;500;600&display=swap](https://fonts.googleapis.com/css2?family=Prompt:wght@200;300;400;500;600&display=swap)" rel="stylesheet">
-
+    <title>Nori Design - โปรไฟล์ร้านค้า</title>
+    <!-- นำเข้าฟอนต์ Kanit เพื่อความสวยงามและอ่านง่าย -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* =========================================
+           Variables (กำหนดโทนสีและลูกเล่นแบบเรียบง่าย น่ารัก)
+           ========================================= */
         :root {
-            --color-cream: #FBF1ED;
-            --color-nude-red: #A6575B;
-            --color-wine-red: #7E3136;
+            --color-bg-light: #FFFDFC;
+            --color-cream: #FDF1ED;
+            --color-nude-red: #B86B73;
+            --color-wine-red: #6D3237;
             --color-white: #FFFFFF;
-            --color-text-dark: #3A1A1C;
-            --color-text-muted: #8A6D6E;
+            
+            --border-radius-sm: 12px;
+            --border-radius-md: 24px;
+            --border-radius-lg: 32px;
+            --border-radius-full: 50%;
+            
+            --shadow-soft: 0 8px 24px rgba(184, 107, 115, 0.12);
+            --shadow-soft-hover: 0 12px 32px rgba(184, 107, 115, 0.25);
         }
 
+        /* =========================================
+           Animations
+           ========================================= */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        @keyframes popInCenter {
+            0% { opacity: 0; transform: translateX(-50%) scale(0.9) translateY(20px); }
+            100% { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
+        }
+
+        /* เพิ่มแอนิเมชันสำหรับตัวหนังสือเลื่อน */
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* เพิ่มแอนิเมชันให้ปุ่มติดต่อขยับดุ๊กดิ๊กน่ารัก */
+        @keyframes pulseCute {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02) translateY(-4px); box-shadow: 0 12px 30px rgba(184, 107, 115, 0.4); }
+        }
+
+        /* แอนิเมชันแผ่นเสียงหมุนตอนเปิดเพลง */
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* =========================================
+           Reset & Base Styles
+           ========================================= */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
         }
 
         body {
-            font-family: 'Prompt', sans-serif;
-            color: var(--color-text-dark);
-            line-height: 1.8;
-            -webkit-font-smoothing: antialiased;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            color: var(--color-wine-red);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--color-bg-light) 0%, var(--color-cream) 100%);
+            box-shadow: 0 0 30px rgba(0,0,0,0.05);
+            position: relative;
             overflow-x: hidden;
-            background-color: transparent;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Ambient Background */
-        .ambient-bg {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: -5;
-            background-color: var(--color-cream);
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .ambient-noise {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='[http://www.w3.org/2000/svg'%3E%3Cfilter](http://www.w3.org/2000/svg'%3E%3Cfilter) id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-            z-index: 2;
-        }
-
-        .glow-blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            z-index: 1;
-            opacity: 0.35;
-            animation: floatGlow 20s infinite ease-in-out alternate;
-        }
-
-        .glow-1 { width: 50vw; height: 50vw; background-color: var(--color-nude-red); top: -10%; left: -10%; animation-duration: 25s; }
-        .glow-2 { width: 60vw; height: 60vw; background-color: var(--color-wine-red); bottom: -20%; right: -10%; opacity: 0.25; animation-duration: 30s; animation-direction: alternate-reverse; }
-        .glow-3 { width: 45vw; height: 45vw; background-color: #E6A2A6; top: 30%; left: 40%; opacity: 0.25; animation-duration: 35s; }
-
-        @keyframes floatGlow {
-            0% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(8vw, 10vh) scale(1.1); }
-            66% { transform: translate(-5vw, -8vh) scale(0.95); }
-            100% { transform: translate(10vw, 5vh) scale(1.05); }
-        }
-
-        /* Sparkle Effects */
-        .sparkle-container {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            pointer-events: none;
-            z-index: 50;
-            overflow: hidden;
-        }
-        
-        .sparkle {
-            position: absolute;
-            opacity: 0;
-            user-select: none;
-            animation: floatSparkle linear infinite;
-        }
-        
-        @keyframes floatSparkle {
-            0% { opacity: 0; transform: translateY(0) scale(0.5) rotate(0deg); }
-            50% { opacity: 0.8; transform: translateY(-30px) scale(1.2) rotate(20deg); }
-            100% { opacity: 0; transform: translateY(-60px) scale(0.5) rotate(45deg); }
-        }
-
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .announcement-bar {
-            background-color: var(--color-wine-red);
-            color: var(--color-white);
-            text-align: center;
-            padding: 10px 15px;
-            font-size: 0.85rem;
-            font-weight: 300;
-            letter-spacing: 1px;
+        /* =========================================
+           Header
+           ========================================= */
+        .top-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(184, 107, 115, 0.1);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
-        .hero-media {
-            width: 100%;
-            height: 300px;
-            background-color: rgba(166, 87, 91, 0.1);
-            position: relative;
-            overflow: hidden;
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            cursor: pointer;
+            transition: transform 0.3s ease;
         }
 
-        .hero-video {
+        .menu-icon:hover { transform: scale(1.1) rotate(5deg); }
+        .menu-icon span { display: block; width: 100%; height: 3px; background-color: var(--color-nude-red); border-radius: 4px; }
+        
+        /* กล่องครอบตัวหนังสือเลื่อน */
+        .header-title-wrapper {
+            flex: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            margin: 0 15px;
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        .header-title { 
+            display: inline-block;
+            font-size: 1.15rem; 
+            font-weight: 500; 
+            color: var(--color-nude-red); 
+            padding-left: 100%;
+            animation: marqueeScroll 10s linear infinite;
+        }
+        
+        /* ปุ่มเปิด-ปิดเพลง */
+        .music-btn {
+            width: 28px;
+            height: 28px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .music-btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(184, 107, 115, 0);
+            transition: all 0.3s ease;
+        }
+
+        /* เมื่อเล่นเพลง ให้แผ่นเสียงหมุนและมีแสงเรืองรอง */
+        .music-btn.playing {
+            animation: spin 3s linear infinite;
+        }
+        .music-btn.playing::after {
+            box-shadow: 0 0 15px rgba(184, 107, 115, 0.6);
+        }
+
+        /* =========================================
+           Main Content
+           ========================================= */
+        .content-area {
+            padding: 24px 20px;
+            padding-bottom: 120px; /* เผื่อปุ่มติดต่อด้านล่าง */
+            flex: 1;
+        }
+
+        /* --- Hero Section --- */
+        .hero-section {
+            position: relative;
+            margin-bottom: 85px;
+            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+        }
+
+        .main-media-placeholder {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: var(--color-white);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: var(--color-nude-red);
+            box-shadow: var(--shadow-soft);
+            transition: all 0.4s ease;
+            overflow: hidden;
+            border: 2px solid var(--color-white);
+            position: relative;
+        }
+        
+        /* เพิ่มฟิลเตอร์สีนู้ดทับวิดีโอให้มีความคุมโทนกับร้าน (Overlay) */
+        .main-media-placeholder::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            /* ไล่สีแดงนู้ดบางๆ */
+            background: linear-gradient(135deg, rgba(184, 107, 115, 0.4) 0%, rgba(109, 50, 55, 0.2) 100%);
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .main-media-placeholder img,
+        .main-media-placeholder video {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            position: absolute;
-            top: 0; left: 0;
-            z-index: 1;
-        }
-
-        .brand-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: -65px; 
             position: relative;
-            z-index: 10;
+            z-index: 0;
         }
 
         .logo-wrapper {
+            position: absolute;
+            bottom: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            animation: popInCenter 0.8s ease forwards;
+            animation-delay: 0.1s;
+            opacity: 0;
+        }
+
+        .floating-group {
             position: relative;
-            width: 130px;
-            height: 130px;
-            margin-bottom: 40px;
+            width: 90px;
+            height: 90px;
             display: flex;
             justify-content: center;
             align-items: center;
+            animation: float 4s ease-in-out infinite;
         }
 
-        .logo-placeholder {
+        .logo-circle {
+            width: 90px;
+            height: 90px;
+            background-color: var(--color-white);
+            border-radius: var(--border-radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--color-nude-red);
+            box-shadow: 0 10px 20px rgba(184, 107, 115, 0.15);
+            overflow: hidden;
+        }
+        
+        .logo-circle img {
             width: 100%;
             height: 100%;
-            background-color: var(--color-white);
-            border-radius: 50%;
-            border: 1px solid var(--color-wine-red);
-            z-index: 2;
-            animation: pulseGlow 4s infinite ease-in-out;
-            background-image: url('[https://i.postimg.cc/Hsj59b0Q/pr-bch-d.jpg](https://i.postimg.cc/Hsj59b0Q/pr-bch-d.jpg)'); 
-            background-size: cover; 
-            background-position: center;
+            object-fit: cover;
         }
 
-        .curved-decorations {
+        .curved-text-svg {
             position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            z-index: 1;
+            top: -35px;
+            left: -35px;
+            width: 160px;
+            height: 160px;
             pointer-events: none;
+            overflow: visible;
         }
 
-        .slogan-section {
-            padding: 1rem 2rem 3rem;
+        /* --- Slogan Box --- */
+        .slogan-box {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 30px;
+            padding: 16px 24px;
             text-align: center;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .slogan-text {
-            font-size: 1.3rem;
+            font-weight: 500;
+            font-size: 0.95rem;
             color: var(--color-wine-red);
-            font-weight: 400;
+            margin-bottom: 35px;
+            box-shadow: var(--shadow-soft);
+            animation: popIn 0.8s ease forwards;
+            animation-delay: 0.2s;
+            opacity: 0;
         }
 
+        .slogan-box span { color: var(--color-nude-red); font-weight: 600; }
+
+        /* --- Services Section --- */
+        .services-section {
+            margin-bottom: 40px;
+            animation: popIn 0.8s ease forwards;
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
+        
         .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-nude-red);
+            margin-bottom: 16px;
             text-align: center;
-            color: var(--color-wine-red);
-            font-size: 1.4rem;
-            margin-bottom: 30px;
         }
 
         .services-container {
-            padding: 0 20px 40px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .grid-layout {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
         }
 
-        .service-card {
-            background-color: var(--color-white);
-            border: 2px dashed rgba(166, 87, 91, 0.35);
-            border-radius: 24px;
-            padding: 25px 15px;
-            text-align: center;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .service-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 8px;
         }
 
-        .service-card:hover {
-            transform: translateY(-8px);
+        .service-item {
+            width: 55px;
+            height: 55px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--color-white) 0%, var(--color-cream) 100%);
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .service-item:hover {
+            transform: translateY(-8px) scale(1.1);
+            background: var(--color-white);
+            box-shadow: var(--shadow-soft-hover);
+        }
+        
+        .service-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--color-wine-red);
+            text-align: center;
+        }
+
+        /* --- Info Cards --- */
+        .info-card {
+            background-color: var(--color-white);
+            border-radius: var(--border-radius-md);
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-soft);
+            animation: popIn 0.8s ease forwards;
+            opacity: 0;
+        }
+        
+        .info-card:nth-child(4) { animation-delay: 0.4s; }
+        .info-card:nth-child(5) { animation-delay: 0.5s; }
+        .info-card:nth-child(6) { animation-delay: 0.6s; }
+        .info-card:nth-child(7) { animation-delay: 0.7s; }
+        .info-card:nth-child(8) { animation-delay: 0.8s; }
+
+        .info-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-nude-red);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px dashed var(--color-cream);
+            padding-bottom: 8px;
+        }
+
+        .price-list {
+            list-style: none;
+        }
+        .price-list li {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            border-bottom: 1px solid #f9ece8;
+            padding-bottom: 8px;
+        }
+        .price-list li:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .price-list li span:last-child { font-weight: 600; color: var(--color-nude-red); }
+
+        .text-list {
+            list-style: none;
+        }
+        .text-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        .text-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--color-nude-red);
+            font-weight: bold;
+        }
+        
+        .rule-text { color: #d9534f; font-weight: 500; }
+
+        /* --- Link Grid --- */
+        .link-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .link-btn {
+            background-color: var(--color-cream);
+            color: var(--color-wine-red);
+            text-decoration: none;
+            padding: 10px 12px;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border: 1px solid transparent;
+        }
+
+        .link-btn:hover {
+            background-color: var(--color-white);
             border-color: var(--color-nude-red);
+            color: var(--color-nude-red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(184, 107, 115, 0.1);
+        }
+        
+        .link-btn-highlight {
+            background: linear-gradient(135deg, var(--color-nude-red) 0%, #d1878f 100%);
+            color: var(--color-white);
+        }
+        .link-btn-highlight:hover {
+            background: var(--color-wine-red);
+            color: var(--color-white);
         }
 
-        .service-icon { font-size: 2.2rem; margin-bottom: 12px; }
-        .service-title { color: var(--color-wine-red); font-size: 1.1rem; margin-bottom: 8px; }
-        .service-price { color: var(--color-nude-red); font-size: 1.2rem; font-weight: 600; background-color: rgba(166, 87, 91, 0.08); padding: 4px 15px; border-radius: 20px; }
-
-        .groups-section { padding: 0 20px 40px; max-width: 1000px; margin: 0 auto; }
-        .group-category { background-color: rgba(255, 255, 255, 0.5); border-radius: 20px; padding: 25px 20px; margin-bottom: 25px; }
-        .group-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
-        .group-btn { background-color: var(--color-white); border: 1px solid var(--color-nude-red); padding: 8px 16px; border-radius: 30px; font-size: 0.9rem; transition: 0.3s; }
-        .group-btn:hover { background-color: var(--color-nude-red); color: var(--color-white); }
-        .group-btn.recommend { border-color: var(--color-wine-red); color: var(--color-wine-red); font-weight: 500; }
-
-        .info-section { padding: 0 20px 40px; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
-        .info-box { background-color: var(--color-white); border-left: 4px solid var(--color-nude-red); padding: 25px; border-radius: 0 12px 12px 0; }
-        .info-list { list-style: none; }
-        .info-list li { position: relative; padding-left: 20px; margin-bottom: 10px; font-size: 0.95rem; }
-        .info-list li::before { content: '•'; position: absolute; left: 0; color: var(--color-nude-red); }
-
-        .action-section { padding: 0 20px 60px; max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
-        .btn-main { display: flex; flex-direction: column; align-items: center; padding: 20px 10px; border-radius: 24px; text-align: center; transition: 0.4s; min-height: 130px; text-decoration: none; color: inherit; }
-        .btn-facebook { background-color: var(--color-wine-red); color: var(--white); border: 2px solid var(--color-wine-red); color: white; }
-        .btn-portfolio { background-color: var(--color-white); border: 2px dashed rgba(166, 87, 91, 0.35); color: var(--color-wine-red); }
-
-        .music-toggle {
-            position: fixed; bottom: 25px; right: 25px; width: 50px; height: 50px;
-            background-color: var(--color-white); border: 2px solid var(--color-nude-red); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; font-size: 1.5rem; cursor: pointer; z-index: 1000;
+        /* --- Image Link Buttons (ปุ่มกลุ่มที่มีรูปภาพ) --- */
+        .image-link-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            gap: 8px;
+            white-space: normal;
+            height: 100%;
+        }
+        
+        .image-link-btn .group-img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: var(--border-radius-sm);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
         }
 
-        .music-playing {
-            animation: rotateSlowly 4s linear infinite;
+        .image-link-btn:hover .group-img {
+            transform: scale(1.05); /* เอฟเฟกต์ซูมรูปน่ารักๆ */
+        }
+        
+        .image-link-btn span {
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        @keyframes rotateSlowly {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* =========================================
+           Contact Footer
+           ========================================= */
+        .contact-fixed-bar {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
         }
 
-        @media (max-width: 480px) {
-            .grid-layout { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .action-section { grid-template-columns: repeat(2, 1fr); }
-            .btn-facebook { grid-column: 1 / -1; }
+        .btn-main {
+            width: 100%;
+            background: linear-gradient(135deg, var(--color-nude-red) 0%, #d1878f 100%);
+            color: var(--color-white);
+            text-decoration: none;
+            text-align: center;
+            padding: 14px 24px;
+            border-radius: 50px;
+            border: 3px solid var(--color-white);
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 20px rgba(184, 107, 115, 0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            animation: pulseCute 2.5s infinite;
         }
+
+        .btn-main:hover {
+            background: var(--color-wine-red);
+            transform: translateY(-2px) scale(1.05);
+            border-color: var(--color-cream);
+            animation: none;
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="ambient-bg">
-        <div class="ambient-noise"></div>
-        <div class="glow-blob glow-1"></div>
-        <div class="glow-blob glow-2"></div>
-        <div class="glow-blob glow-3"></div>
-    </div>
+    <!-- แท็ก Audio สำหรับใส่เพลงพื้นหลัง (ซ่อนไว้และให้เล่นวนลูป) -->
+    <!-- เพิ่ม preload และ crossorigin เพื่อรองรับทุกเบราว์เซอร์ -->
+    <audio id="bgMusic" loop preload="auto" crossorigin="anonymous">
+        <source src="bgm.mp3" type="audio/mp3">
+    </audio>
 
-    <div class="announcement-bar">
-        🌻 ยินดีต้อนรับเข้าสู้ร้านโนริค่า สอบถามได้นะคะ มีสะสมแต้ม 🌻
-    </div>
-
-    <div class="hero-media">
-        <!-- ลิงก์วิดีโอตรงจาก GitHub -->
-        <video class="hero-video reveal active" autoplay loop muted playsinline webkit-playsinline preload="auto" x5-playsinline x5-video-player-type="h5">
-            <source src="[https://raw.githubusercontent.com/Nori-beep/Nesszy/main/banner.mp4](https://raw.githubusercontent.com/Nori-beep/Nesszy/main/banner.mp4)" type="video/mp4">
-        </video>
-    </div>
-
-    <div class="brand-section">
-        <div class="logo-wrapper reveal active">
-            <div class="logo-placeholder"></div>
-            <svg class="curved-decorations" viewBox="0 0 200 200">
-                <path id="text-path" d="M 35 125 A 70 70 0 0 0 165 125" fill="transparent" />
-                <text fill="var(--color-wine-red)" font-family="'Prompt', sans-serif" font-weight="500" font-size="18" letter-spacing="2">
-                    <textPath href="#text-path" startOffset="50%" text-anchor="middle">
-                        Nori Design
-                    </textPath>
-                </text>
-            </svg>
-        </div>
-    </div>
-
-    <div class="slogan-section reveal">
-        <div class="slogan-box">
-            <h2 class="slogan-text">
-                🌻ร้านโนริพร้อมให้บริการค่า<br>
-                ส่องให้อิน ไว้ใจทางร้านค่อยมาแวะน้า🌻<br>
-                🌈พร้อมให้บริการลูกค้าน่ารักๆทุกท่าน💗
-            </h2>
-        </div>
-    </div>
-
-    <div class="services-container">
-        <h3 class="section-title reveal">🎨 เรทราคางานที่รับทำ</h3>
-        <div class="grid-layout">
-            <div class="service-card reveal">
-                <div class="service-icon">🪄</div>
-                <h4 class="service-title">งานป้าย</h4>
-                <div class="service-price">เริ่มต้น 89.-</div>
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="top-header">
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
-            <div class="service-card reveal delay-1">
-                <div class="service-icon">💬</div>
-                <h4 class="service-title">สติกเกอร์แชท / ไอจี</h4>
-                <div class="service-price">เริ่มต้น 59.-</div>
+            <div class="header-title-wrapper">
+                <div class="header-title">🌻ยินดีต้อนรับเข้าสู่ร้านโนริ🌻</div>
             </div>
-            <div class="service-card reveal delay-2">
-                <div class="service-icon">🐻</div>
-                <h4 class="service-title">สติกเกอร์ไลน์</h4>
-                <div class="service-price">เริ่มต้น 189.-</div>
-            </div>
-            <div class="service-card reveal delay-3">
-                <div class="service-icon">💻</div>
-                <h4 class="service-title">ทำเว็บร้านค้า</h4>
-                <div class="service-price">เริ่มต้น 129.-</div>
-            </div>
+            <!-- ปุ่มควบคุมเพลงมุมขวาบน -->
+            <button id="musicToggleBtn" class="music-btn" title="เล่น/หยุดเพลง">💿</button>
+        </header>
 
-            <a href="[https://ksm-bb.github.io/Nori-Design/](https://ksm-bb.github.io/Nori-Design/)" target="_blank" class="reveal" style="grid-column: 1 / -1; display: block; max-width: 450px; margin: 0 auto; border-radius: 24px; overflow: hidden; box-shadow: 0 8px 20px rgba(126, 49, 54, 0.05);">
-                <img src="[https://i.postimg.cc/qMSxS1QF/IMG-1340.jpg](https://i.postimg.cc/qMSxS1QF/IMG-1340.jpg)" alt="จุดเช็คคิว" style="width: 100%; display: block;">
+        <!-- Main Content -->
+        <main class="content-area">
+            
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <!-- วิดีโอ Banner ร้าน (วิวทะเลคุมโทน) -->
+                <div class="main-media-placeholder">
+                    <!-- เพิ่มแอตทริบิวต์ webkit-playsinline และอื่นๆ เพื่อบังคับเล่นในจอแบบไม่เด้งใน iOS และ In-App Browser -->
+                    <video autoplay loop muted playsinline webkit-playsinline disablePictureInPicture>
+                        <source src="banner.mp4" type="video/mp4">
+                        เบราว์เซอร์ของคุณไม่รองรับวิดีโอ
+                    </video>
+                </div>
+                
+                <div class="logo-wrapper">
+                    <div class="floating-group">
+                        <div class="logo-circle">
+                            <img src="https://i.postimg.cc/ncNGHWk3/IMG-7946.png" alt="Logo Nori Design">
+                        </div>
+                        <!-- เส้นโค้งชื่อร้าน -->
+                        <svg class="curved-text-svg" viewBox="0 0 160 160">
+                            <path id="shop-name-curve" d="M 10 85 A 68 68 0 0 0 150 85" fill="transparent" />
+                            <text fill="var(--color-nude-red)" font-family="'Kanit', sans-serif" font-size="18px" font-weight="600" letter-spacing="0.5px">
+                                <textPath href="#shop-name-curve" startOffset="50%" text-anchor="middle">
+                                    Nori Design
+                                </textPath>
+                            </text>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slogan -->
+            <section class="slogan-box">
+                สวัสดีค่า โนริพร้อมให้บริการค้าบ✨<br>🌈ส่องให้อิน แล้วแวะมานะค้าบ🌻
+            </section>
+
+            <!-- Services Row -->
+            <section class="services-section">
+                <div class="section-title">🎨 งานที่รับทำ</div>
+                <div class="services-container">
+                    <div class="service-wrapper">
+                        <div class="service-item">🏷️</div>
+                        <div class="service-label">ทำป้าย</div>
+                    </div>
+                    <div class="service-wrapper">
+                        <div class="service-item">✨</div>
+                        <div class="service-label">สติกเกอร์</div>
+                    </div>
+                    <div class="service-wrapper">
+                        <div class="service-item">💻</div>
+                        <div class="service-label">เว็บร้านค้า</div>
+                    </div>
+                    <div class="service-wrapper">
+                        <div class="service-item">👥</div>
+                        <div class="service-label">ดึงเข้ากลุ่ม</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pricing Info Card -->
+            <section class="info-card">
+                <h3 class="info-card-title">💸 เรทราคางานที่รับทำ</h3>
+                <ul class="price-list">
+                    <li><span>งานป้าย</span> <span>เริ่มต้น 89.-</span></li>
+                    <li><span>สติกเกอร์แชท/ไอจี</span> <span>เริ่มต้น 59.-</span></li>
+                    <li><span>สติกเกอร์ไลน์รูปตัวเอง/ลูกอื่นๆ</span> <span>เริ่มต้น 189.-</span></li>
+                    <li><span>ทำเว็บร้านค้า</span> <span>เริ่มต้น 129.-</span></li>
+                </ul>
+            </section>
+
+            <!-- Groups 1 -->
+            <section class="info-card">
+                <h3 class="info-card-title">🌻 รวมกลุ่มที่ดึงเมลเอง</h3>
+                <div class="link-grid">
+                    <a href="https://drive.google.com/drive/folders/1YKwLAZogYhZKBWPBxGKTGVwzR3zcEDel" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/4NTmZ4r9/IMG-0690.jpg" alt="เส้นปะ" class="group-img">
+                        <span>เส้นปะ</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1Ye9suMpDDivZ45bzRfnQ0f-o1w0dEHvQ" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/L4PpHtpr/D3AF8DC0-E077-4CF9-BC5E-DA4F793B823B.jpg" alt="INKY GROUP" class="group-img">
+                        <span>INKY GROUP</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1EHSj38mZ9XxLsmS1WXyrjTIOsl7sjGQK" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/WzNC6kdd/IMG-9847.jpg" alt="ลายเส้น Belinda" class="group-img">
+                        <span>ลายเส้น Belinda</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1fItAncfAu3g91k6dYNnX7EEihn3dj4kS" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/nVQf2vSX/4DBD5B4E-8F00-40EC-9E19-561D8015B380.jpg" alt="Still drawing v1" class="group-img">
+                        <span>Still drawing v1</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1V9U2f1Z9HHZmFqVR5H_H_XRo-VF-D6T5" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/bNs8K7v1/mi-m-ch-x-209-20260208102857.png" alt="Still drawing v2" class="group-img">
+                        <span>Still drawing v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1EdZHXv2yzinG1-fCTeszo4IFTcEwBN1t" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/3NsbQ15N/mi-m-ch-x-15-20260409105335.png" alt="Merita" class="group-img">
+                        <span>Merita</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1NdbzjMsB3Le66YlvXCWt6ywZI18__sVk" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/NGRjNq5Y/402B7445-6728-4F7B-82F4-905E9296008C.jpg" alt="Calista" class="group-img">
+                        <span>Calista</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/117KeqfEJU-VrfHPzpAPDeNT62nvaPB7a" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/4ddp64JZ/att-p8X8tf-Vs5HHh-Fyen2EHhoxqx-P3s6ku-Q-ct4s-Yi5m26A.jpg" alt="Jamille" class="group-img">
+                        <span>Jamille</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1drtqFx3YBzHjnrjt-BrzdZm5FFlyBCKW" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/wxRmgGMZ/IMG-0923.jpg" alt="Pancake" class="group-img">
+                        <span>Pancake</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1lWfTHqAbVoZH2YveT70TO5pmfiikwY3G" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/zXv9PTGQ/IMG-1322.jpg" alt="Queen pop" class="group-img">
+                        <span>Queen pop</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1ijU1i-CNAZgKTul6lmiN6VIDsPwVU2sd" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/jjn8zhvc/mi-m-ch-x-8-20260404131206.png" alt="Hormony" class="group-img">
+                        <span>Hormony</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1pgnqUzdmjW7vK0s_fNCV0SY6-S-FHOzp" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/MKdy8hKs/mi-m-ch-x-230-20260310203249.png" alt="Moonie" class="group-img">
+                        <span>Moonie</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1LaYCivILFAjqKgnzTMJJ5RlRXZgB9YWf" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/SKKGrfrZ/mi-m-ch-x-225-20260220112659.png" alt="Fusion" class="group-img">
+                        <span>Fusion</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1CrGdw6jr_cYcRr2LXKq_yhrkMvna8fVX" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/XNLgBh4y/IMG-1324.jpg" alt="kawaii Fuji" class="group-img">
+                        <span>kawaii Fuji</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/13zR7r66v8hO-rD2t6LahxD1f9Mc8J1Ue" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/KYRmyCfs/34095E6F-A7F5-47B1-997F-21D8B4F9DF07.jpg" alt="Teaching group" class="group-img">
+                        <span>Teaching group</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1d6IxpNl4zajE7XP-W2KJ17wkGPkG11uj" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/657Yscxs/IMG-8753.jpg" alt="Mitarashi" class="group-img">
+                        <span>Mitarashi</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1cV7jkDmRh1VD-nD_I-VDsW__zUzSFYYQ" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/LXbr7ygp/mi-m-ch-x-210-20260306131359.png" alt="Jainoy" class="group-img">
+                        <span>Jainoy</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1skKUNZSFr1cE_PQwmk5dG-26zjnaRq9J" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/mDXtBQWk/IMG-1323.jpg" alt="ฟุคุเนโกะ" class="group-img">
+                        <span>ฟุคุเนโกะ</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1KE9lcHUTP5sS8csxiCD9shzwH3dW9gzV" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/J0CJ9NNV/IMG-6637.jpg" alt="Glitter magic" class="group-img">
+                        <span>Glitter magic</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1Ufh9MFi49FBX00bPe05pXAtlWMdG3-0k" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/bwZJ9GnV/IMG-6638.jpg" alt="แมวดำ" class="group-img">
+                        <span>แมวดำ</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1_szs-_HaCJMy6hBb7N4_dDVzZW4jkQoS" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/15t5ygvz/IMG-6636.jpg" alt="Jellybunnie v2" class="group-img">
+                        <span>Jellybunnie v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1QGC5IfTfafn6s0OFwhW17p92fwpAs2fx" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/Rh80k45c/75C6487B-CC41-42BE-94F0-4E0EAB356111.jpg" alt="Jellybunnie v1" class="group-img">
+                        <span>Jellybunnie v1</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/10YI5_ZXufqnMh896HnB2Z6LD888Imh-0" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/3N9XmyvV/6ADA330A-D064-4D9A-A39C-48E233EEA3EA.jpg" alt="นุบนิบบรัช" class="group-img">
+                        <span>นุบนิบบรัช</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1mDzXfPna4LjDyzU8jRJT9-LQykywM1YZ" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/DzbT8LGT/IMG-0367.jpg" alt="Trick sticker by nes" class="group-img">
+                        <span>Trick sticker by nes</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1VG-NqauROtZhjzgYePtfd6TI3XsKry7f" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/X738Wfft/mi-m-ch-x-198-20260306115332.png" alt="Sugar plum v1" class="group-img">
+                        <span>Sugar plum v1</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1IhgsHW0niXL1P7TN-muEteDPSe7lPEwq" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/qMdmRVTW/mi-m-ch-x-251-20260319222852.png" alt="Sugar plum v2" class="group-img">
+                        <span>Sugar plum v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1-TTWSUqSELb80zXcnYaZaYxTyGRLio5W" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/13sYWx7P/mi-m-ch-x-210-20260306134602.png" alt="kuromi box" class="group-img">
+                        <span>kuromi box</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1g565WGi56qOg09APdgYthQPRZYHsQ9pf" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/bJC6rsq9/mi-m-ch-x-230-20260310153533.png" alt="Little spark" class="group-img">
+                        <span>Little spark</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1A5FC5j1dGakbow9ISiFywUSPOymAXPSW?usp=drive_link" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/vHBgFhqh/att-Pq-Ap-c6YBh-LNi-p-GWf-XCRsig2RSzk-Lj-Xcgfj-LOz3to-A.jpg" alt="Vioer" class="group-img">
+                        <span>Vioer</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1e8R2bs55n3ppm4cP-DTbp7PxPBZZLi2F" target="_blank" class="link-btn image-link-btn">
+                        <img src="https://i.postimg.cc/9XksqrWD/IMG-8296.jpg" alt="Pikoro" class="group-img">
+                        <span>Pikoro</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Groups 2 -->
+            <section class="info-card">
+                <h3 class="info-card-title">📍 กลุ่มที่แนะนำว่าต้องมี 🌈</h3>
+                <div class="link-grid">
+                    <a href="https://drive.google.com/drive/folders/18wz_Hx9Iik7YGXZK4nOi8i2z1IdcZOg6" target="_blank" class="link-btn link-btn-highlight image-link-btn">
+                        <img src="https://i.postimg.cc/0ySNPBpY/att-Gle-UAy-INh-IVTOAFH4nb-Or-C-e-UArc-N7Pcr-J5ngv6NPY8.jpg" alt="Serabies box" class="group-img">
+                        <span>Serabies box</span>
+                    </a>
+                    <a href="https://shorturl.asia/zVTa9" target="_blank" class="link-btn link-btn-highlight image-link-btn">
+                        <img src="https://i.postimg.cc/90vjkcg8/att-x3zw-sg-Ge-HCLy-yf-Dk6V-dulha-Lw-Cb-Aa9x-REHSct8.jpg" alt="Rosella" class="group-img">
+                        <span>Rosella</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1O5mfoZTg1Ecoh99PsIz3EEgAWvAWUc0Q" target="_blank" class="link-btn link-btn-highlight image-link-btn">
+                        <img src="https://i.postimg.cc/ncZGMW9k/mi-m-ch-x-230-20260310153044.png" alt="Kelbies v1" class="group-img">
+                        <span>Kelbies v1</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1v7GevdSytdczmDmOlQ7tF3AEOunTHqBc" target="_blank" class="link-btn link-btn-highlight image-link-btn">
+                        <img src="https://i.postimg.cc/gkYyw3MM/att-yc-C6Ki-LKU-R18v-Inz-H7na2vtmo3txrjk-ISBN8Cs-Kp-Wo.jpg" alt="Kelbies v2" class="group-img">
+                        <span>Kelbies v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1ymzwaJGDlrMyp7JJB9kkJMl4bH8utyz7" target="_blank" class="link-btn link-btn-highlight image-link-btn">
+                        <img src="https://i.postimg.cc/j2Rf7rhq/att-wdcvr-Ovir4-Wl-IV0EVEw-dg-Sm2H7-26HBoh-FMVYZ-ZQ.jpg" alt="Kellynori v1" class="group-img">
+                        <span>Kellynori v1</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1MJ9SuXIzyz3_alVFNA_HQ3oMULjRpQdQ" target="_blank" class="link-btn link-btn-highlight image-link-btn">
+                        <img src="https://i.postimg.cc/15CFf2Vy/att-G7TBRf-Rbaa-Whodx-V3b-OQVrhn-KVVTa-IAcr-o-ZZn276U8.jpg" alt="Kellynori v2" class="group-img">
+                        <span>Kellynori v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1hiHUQv2oRy2SQCMefPAiKjR3iNjoPlyT" target="_blank" class="link-btn link-btn-highlight image-link-btn">
+                        <img src="https://i.postimg.cc/pX2KPn3g/mi-m-ch-x-230-20260310153314.png" alt="little baby" class="group-img">
+                        <span>little baby</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/14RG7Br-1PVr8K76cb2gnQZgDacK6Hp6Q" target="_blank" class="link-btn link-btn-highlight image-link-btn">
+                        <img src="https://i.postimg.cc/Xvv2qzh9/mi-m-ch-x-230-20260310151157.png" alt="miracle effect v1" class="group-img">
+                        <span>miracle effect v1</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/11Pq2C3rt8CIBbhV7Pn-IXYmahdmjRR7n" target="_blank" class="link-btn link-btn-highlight image-link-btn">
+                        <img src="https://i.postimg.cc/qvGJ4NVC/mi-m-ch-x-230-20260310155255.png" alt="miracle effect v2" class="group-img">
+                        <span>miracle effect v2</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1cgM-RKOiolqM8g8bH3AjN9GeEPyUxUYH" target="_blank" class="link-btn link-btn-highlight image-link-btn">
+                        <img src="https://i.postimg.cc/ZqkRKGCn/mi-m-ch-x-251-20260313194240.png" alt="สอนวาดฮาวคิ้ว" class="group-img">
+                        <span>สอนวาดฮาวคิ้ว</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Examples -->
+            <section class="info-card">
+                <h3 class="info-card-title">⭐️ ตัวอย่างผลงานและกลุ่ม</h3>
+                <div class="link-grid" style="grid-template-columns: 1fr;">
+                    <a href="https://linkbio.co/noridesign" target="_blank" class="link-btn">📌 ตัวอย่างกลุ่มต่างๆ (Linkbio)</a>
+                    <a href="https://drive.google.com/drive/folders/1ovnS1imBV8jKO-fCHfBhnd3NDw8Yl1lv" target="_blank" class="link-btn">🖼️ ตัวอย่างงาน (Google Drive)</a>
+                </div>
+            </section>
+
+            <!-- Steps & Conditions -->
+            <section class="info-card">
+                <h3 class="info-card-title">📋 ขั้นตอนและเงื่อนไข</h3>
+                
+                <h4 style="font-size: 0.95rem; margin-top: 10px; margin-bottom: 5px;">ขั้นตอนการเข้ากลุ่ม:</h4>
+                <ul class="text-list">
+                    <li>ดูตัวอย่างแล้วแคปรูปกลุ่มที่สนใจ ทักเฟสได้เลย</li>
+                    <li>รวมยอด โอนเงิน</li>
+                    <li>รอดึงเข้ากลุ่มได้เลย</li>
+                </ul>
+
+                <h4 style="font-size: 0.95rem; margin-top: 15px; margin-bottom: 5px;">เงื่อนไขงานป้าย/สติกเกอร์:</h4>
+                <ul class="text-list">
+                    <li>ตามปกติรองาน 1-2 วัน แล้วแต่คิวของวันนั้นๆ</li>
+                    <li>งานเร่ง *2 ของราคา</li>
+                    <li>งานเว็บรอประมาณ 4-8 ชั่วโมง ของแต่ละคิว</li>
+                </ul>
+            </section>
+
+            <!-- Rules -->
+            <section class="info-card">
+                <h3 class="info-card-title">📍 กฎของร้าน 📍</h3>
+                <ul class="text-list rule-text">
+                    <li>โอนเงินแล้วไม่รับโอนคืนทุกกรณี</li>
+                    <li>โอนผิด โอนเกิน ทางร้านไม่รับผิดชอบ</li>
+                    <li>หากยกเลิกงานหลังส่งบรีฟมาแล้ว หรือหากงานเริ่มไปแล้วจะคืนแค่ 50% ค่ะ</li>
+                    <li>หากยกเลิกหลังจากเช็คงาน = ไม่คืน และส่งงานให้ตามนั้น</li>
+                </ul>
+            </section>
+
+        </main>
+
+        <!-- Fixed Contact Button at Bottom -->
+        <div class="contact-fixed-bar">
+            <a href="https://www.facebook.com/nori.desing?" target="_blank" class="btn-main">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.675 0H1.325C0.593 0 0 0.593 0 1.325V22.676C0 23.407 0.593 24 1.325 24H12.82V14.706H9.692V11.084H12.82V8.413C12.82 5.313 14.713 3.625 17.479 3.625C18.804 3.625 19.942 3.724 20.274 3.768V7.008L18.356 7.009C16.852 7.009 16.561 7.724 16.561 8.772V11.085H20.148L19.681 14.707H16.561V24H22.677C23.407 24 24 23.407 24 22.675V1.325C24 0.593 23.407 0 22.675 0Z"/>
+                </svg>
+                ติดต่อผ่าน Facebook
             </a>
         </div>
+
     </div>
 
-    <div class="groups-section">
-        <div class="group-category reveal">
-            <h4>🌻 รวมกลุ่มที่ดึงเมลเอง</h4>
-            <div class="group-grid">
-                <a href="[https://drive.google.com/drive/folders/1YKwLAZogYhZKBWPBxGKTGVwzR3zcEDel](https://drive.google.com/drive/folders/1YKwLAZogYhZKBWPBxGKTGVwzR3zcEDel)" target="_blank" class="group-btn">เส้นปะ</a>
-                <a href="[https://drive.google.com/drive/folders/1Ye9suMpDDivZ45bzRfnQ0f-o1w0dEHvQ](https://drive.google.com/drive/folders/1Ye9suMpDDivZ45bzRfnQ0f-o1w0dEHvQ)" target="_blank" class="group-btn">INKY GROUP</a>
-                <a href="[https://drive.google.com/drive/folders/1EHSj38mZ9XxLsmS1WXyrjTIOsl7sjGQK](https://drive.google.com/drive/folders/1EHSj38mZ9XxLsmS1WXyrjTIOsl7sjGQK)" target="_blank" class="group-btn">ลายเส้น Belinda</a>
-                <a href="[https://drive.google.com/drive/folders/1fItAncfAu3g91k6dYNnX7EEihn3dj4kS](https://drive.google.com/drive/folders/1fItAncfAu3g91k6dYNnX7EEihn3dj4kS)" target="_blank" class="group-btn">Still drawing v1</a>
-                <a href="[https://drive.google.com/drive/folders/1V9U2f1Z9HHZmFqVR5H_H_XRo-VF-D6T5](https://drive.google.com/drive/folders/1V9U2f1Z9HHZmFqVR5H_H_XRo-VF-D6T5)" target="_blank" class="group-btn">Still drawing v2</a>
-                <a href="[https://drive.google.com/drive/folders/1EdZHXv2yzinG1-fCTeszo4IFTcEwBN1t](https://drive.google.com/drive/folders/1EdZHXv2yzinG1-fCTeszo4IFTcEwBN1t)" target="_blank" class="group-btn">Merita</a>
-                <a href="[https://drive.google.com/drive/folders/1NdbzjMsB3Le66YlvXCWt6ywZI18__sVk](https://drive.google.com/drive/folders/1NdbzjMsB3Le66YlvXCWt6ywZI18__sVk)" target="_blank" class="group-btn">Calista</a>
-                <a href="[https://drive.google.com/drive/folders/117KeqfEJU-VrfHPzpAPDeNT62nvaPB7a](https://drive.google.com/drive/folders/117KeqfEJU-VrfHPzpAPDeNT62nvaPB7a)" target="_blank" class="group-btn">Jamille</a>
-                <a href="[https://drive.google.com/drive/folders/1drtqFx3YBzHjnrjt-BrzdZm5FFlyBCKW](https://drive.google.com/drive/folders/1drtqFx3YBzHjnrjt-BrzdZm5FFlyBCKW)" target="_blank" class="group-btn">Pancake</a>
-                <a href="[https://drive.google.com/drive/folders/1lWfTHqAbVoZH2YveT70TO5pmfiikwY3G](https://drive.google.com/drive/folders/1lWfTHqAbVoZH2YveT70TO5pmfiikwY3G)" target="_blank" class="group-btn">Queen pop</a>
-                <a href="[https://drive.google.com/drive/folders/1ijU1i-CNAZgKTul6lmiN6VIDsPwVU2sd](https://drive.google.com/drive/folders/1ijU1i-CNAZgKTul6lmiN6VIDsPwVU2sd)" target="_blank" class="group-btn">Hormony</a>
-                <a href="[https://drive.google.com/drive/folders/1pgnqUzdmjW7vK0s_fNCV0SY6-S-FHOzp](https://drive.google.com/drive/folders/1pgnqUzdmjW7vK0s_fNCV0SY6-S-FHOzp)" target="_blank" class="group-btn">Moonie</a>
-                <a href="[https://drive.google.com/drive/folders/1LaYCivILFAjqKgnzTMJJ5RlRXZgB9YWf](https://drive.google.com/drive/folders/1LaYCivILFAjqKgnzTMJJ5RlRXZgB9YWf)" target="_blank" class="group-btn">Fusion</a>
-                <a href="[https://drive.google.com/drive/folders/1CrGdw6jr_cYcRr2LXKq_yhrkMvna8fVX](https://drive.google.com/drive/folders/1CrGdw6jr_cYcRr2LXKq_yhrkMvna8fVX)" target="_blank" class="group-btn">kawaii Fuji</a>
-                <a href="[https://drive.google.com/drive/folders/13zR7r66v8hO-rD2t6LahxD1f9Mc8J1Ue](https://drive.google.com/drive/folders/13zR7r66v8hO-rD2t6LahxD1f9Mc8J1Ue)" target="_blank" class="group-btn">Teaching group</a>
-                <a href="[https://drive.google.com/drive/folders/1d6IxpNl4zajE7XP-W2KJ17wkGPkG11uj](https://drive.google.com/drive/folders/1d6IxpNl4zajE7XP-W2KJ17wkGPkG11uj)" target="_blank" class="group-btn">Mitarashi</a>
-                <a href="[https://drive.google.com/drive/folders/1cV7jkDmRh1VD-nD_I-VDsW__zUzSFYYQ](https://drive.google.com/drive/folders/1cV7jkDmRh1VD-nD_I-VDsW__zUzSFYYQ)" target="_blank" class="group-btn">Jainoy</a>
-                <a href="[https://drive.google.com/drive/folders/1skKUNZSFr1cE_PQwmk5dG-26zjnaRq9J](https://drive.google.com/drive/folders/1skKUNZSFr1cE_PQwmk5dG-26zjnaRq9J)" target="_blank" class="group-btn">ฟุคุเนโกะ</a>
-                <a href="[https://drive.google.com/drive/folders/1KE9lcHUTP5sS8csxiCD9shzwH3dW9gzV](https://drive.google.com/drive/folders/1KE9lcHUTP5sS8csxiCD9shzwH3dW9gzV)" target="_blank" class="group-btn">Glitter magic</a>
-                <a href="[https://drive.google.com/drive/folders/1Ufh9MFi49FBX00bPe05pXAtlWMdG3-0k](https://drive.google.com/drive/folders/1Ufh9MFi49FBX00bPe05pXAtlWMdG3-0k)" target="_blank" class="group-btn">แมวดำ</a>
-                <a href="[https://drive.google.com/drive/folders/1_szs-_HaCJMy6hBb7N4_dDVzZW4jkQoS](https://drive.google.com/drive/folders/1_szs-_HaCJMy6hBb7N4_dDVzZW4jkQoS)" target="_blank" class="group-btn">Jellybunnie v2</a>
-                <a href="[https://drive.google.com/drive/folders/1QGC5IfTfafn6s0OFwhW17p92fwpAs2fx](https://drive.google.com/drive/folders/1QGC5IfTfafn6s0OFwhW17p92fwpAs2fx)" target="_blank" class="group-btn">Jellybunnie v1</a>
-                <a href="[https://drive.google.com/drive/folders/10YI5_ZXufqnMh896HnB2Z6LD888Imh-0](https://drive.google.com/drive/folders/10YI5_ZXufqnMh896HnB2Z6LD888Imh-0)" target="_blank" class="group-btn">นุบนิบบรัช</a>
-                <a href="[https://drive.google.com/drive/folders/1mDzXfPna4LjDyzU8jRJT9-LQykywM1YZ](https://drive.google.com/drive/folders/1mDzXfPna4LjDyzU8jRJT9-LQykywM1YZ)" target="_blank" class="group-btn">Trick sticker by nes</a>
-                <a href="[https://drive.google.com/drive/folders/1VG-NqauROtZhjzgYePtfd6TI3XsKry7f](https://drive.google.com/drive/folders/1VG-NqauROtZhjzgYePtfd6TI3XsKry7f)" target="_blank" class="group-btn">Sugar plum v1</a>
-                <a href="[https://drive.google.com/drive/folders/1IhgsHW0niXL1P7TN-muEteDPSe7lPEwq](https://drive.google.com/drive/folders/1IhgsHW0niXL1P7TN-muEteDPSe7lPEwq)" target="_blank" class="group-btn">Sugar plum v2</a>
-                <a href="[https://drive.google.com/drive/folders/1-TTWSUqSELb80zXcnYaZaYxTyGRLio5W](https://drive.google.com/drive/folders/1-TTWSUqSELb80zXcnYaZaYxTyGRLio5W)" target="_blank" class="group-btn">kuromi box</a>
-                <a href="[https://drive.google.com/drive/folders/1g565WGi56qOg09APdgYthQPRZYHsQ9pf](https://drive.google.com/drive/folders/1g565WGi56qOg09APdgYthQPRZYHsQ9pf)" target="_blank" class="group-btn">Little spark</a>
-                <a href="[https://drive.google.com/drive/folders/1A5FC5j1dGakbow9ISiFywUSPOymAXPSW?usp=drive_link](https://drive.google.com/drive/folders/1A5FC5j1dGakbow9ISiFywUSPOymAXPSW?usp=drive_link)" target="_blank" class="group-btn">Vioer</a>
-                <a href="[https://drive.google.com/drive/folders/1e8R2bs55n3ppm4cP-DTbp7PxPBZZLi2F](https://drive.google.com/drive/folders/1e8R2bs55n3ppm4cP-DTbp7PxPBZZLi2F)" target="_blank" class="group-btn">Pikoro</a>
-            </div>
-        </div>
-        <div class="group-category reveal">
-            <h4>📍 กลุ่มที่แนะนำว่าต้องมี 🌈</h4>
-            <div class="group-grid">
-                <a href="[https://drive.google.com/drive/folders/18wz_Hx9Iik7YGXZK4nOi8i2z1IdcZOg6](https://drive.google.com/drive/folders/18wz_Hx9Iik7YGXZK4nOi8i2z1IdcZOg6)" target="_blank" class="group-btn recommend">Serabies</a>
-                <a href="[https://shorturl.asia/zVTa9](https://shorturl.asia/zVTa9)" target="_blank" class="group-btn recommend">Rosella</a>
-                <a href="[https://drive.google.com/drive/folders/1O5mfoZTg1Ecoh99PsIz3EEgAWvAWUc0Q](https://drive.google.com/drive/folders/1O5mfoZTg1Ecoh99PsIz3EEgAWvAWUc0Q)" target="_blank" class="group-btn recommend">Kelbies v1</a>
-                <a href="[https://drive.google.com/drive/folders/1v7GevdSytdczmDmOlQ7tF3AEOunTHqBc](https://drive.google.com/drive/folders/1v7GevdSytdczmDmOlQ7tF3AEOunTHqBc)" target="_blank" class="group-btn recommend">Kelbies v2</a>
-                <a href="[https://drive.google.com/drive/folders/1ymzwaJGDlrMyp7JJB9kkJMl4bH8utyz7](https://drive.google.com/drive/folders/1ymzwaJGDlrMyp7JJB9kkJMl4bH8utyz7)" target="_blank" class="group-btn recommend">Kellynori v1</a>
-                <a href="[https://drive.google.com/drive/folders/1MJ9SuXIzyz3_alVFNA_HQ3oMULjRpQdQ](https://drive.google.com/drive/folders/1MJ9SuXIzyz3_alVFNA_HQ3oMULjRpQdQ)" target="_blank" class="group-btn recommend">kellynori v2</a>
-                <a href="[https://drive.google.com/drive/folders/1hiHUQv2oRy2SQCMefPAiKjR3iNjoPlyT](https://drive.google.com/drive/folders/1hiHUQv2oRy2SQCMefPAiKjR3iNjoPlyT)" target="_blank" class="group-btn recommend">little baby</a>
-                <a href="[https://drive.google.com/drive/folders/14RG7Br-1PVr8K76cb2gnQZgDacK6Hp6Q](https://drive.google.com/drive/folders/14RG7Br-1PVr8K76cb2gnQZgDacK6Hp6Q)" target="_blank" class="group-btn recommend">miracle effect v1</a>
-                <a href="[https://drive.google.com/drive/folders/11Pq2C3rt8CIBbhV7Pn-IXYmahdmjRR7n](https://drive.google.com/drive/folders/11Pq2C3rt8CIBbhV7Pn-IXYmahdmjRR7n)" target="_blank" class="group-btn recommend">miracle effect v2</a>
-                <a href="[https://drive.google.com/drive/folders/1cgM-RKOiolqM8g8bH3AjN9GeEPyUxUYH](https://drive.google.com/drive/folders/1cgM-RKOiolqM8g8bH3AjN9GeEPyUxUYH)" target="_blank" class="group-btn recommend">สอนวาดฮาวคิ้ว</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="info-section">
-        <div class="info-box reveal">
-            <h4>📋 ขั้นตอนการเข้ากลุ่ม</h4>
-            <ul class="info-list">
-                <li>ดูตัวอย่างแล้ว <span>แคปรูปกลุ่มที่สนใจ</span> ทักเฟสได้เลย</li>
-                <li>รวมยอด โอนเงิน</li>
-                <li>รอดึงเข้ากลุ่มได้เลย</li>
-            </ul>
-        </div>
-        <div class="info-box reveal delay-1">
-            <h4>📋 เงื่อนไขงานป้าย / สติกเกอร์</h4>
-            <ul class="info-list">
-                <li>ตามปกติรองาน <span>1-2 วัน</span> แล้วแต่คิวของวันนั้นๆ</li>
-                <li>งานเร่ง <span>*2 ของราคา</span></li>
-                <li>งานเว็บรอประมาณ <span>4-8 ชั่วโมง</span> ของแต่ละคิว</li>
-            </ul>
-        </div>
-        <div class="info-box reveal delay-2">
-            <h4>📍 กฎของร้าน</h4>
-            <ul class="info-list">
-                <li>โอนเงินแล้ว <span>ไม่รับโอนคืนทุกกรณี</span></li>
-                <li>โอนผิดโอนเกิน ทางร้านไม่รับผิดชอบ</li>
-                <li>หากยกเลิกงานหลังส่งบรีฟมาแล้ว คืนแค่ 50%</li>
-                <li>หากยกเลิกหลังจากเช็คงาน = ไม่คืนเงิน</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="action-section reveal delay-3">
-        <a href="[https://linkbio.co/noridesign](https://linkbio.co/noridesign)" target="_blank" class="btn-main btn-portfolio">
-            <div class="btn-icon">⭐️</div>
-            <span>ตัวอย่างกลุ่มต่างๆ</span>
-        </a>
-        <a href="[https://drive.google.com/drive/folders/1ovnS1imBV8jKO-fCHfBhnd3NDw8Yl1lv](https://drive.google.com/drive/folders/1ovnS1imBV8jKO-fCHfBhnd3NDw8Yl1lv)" target="_blank" class="btn-main btn-portfolio">
-            <div class="btn-icon">🎨</div>
-            <span>ดูตัวอย่างงานที่นี่</span>
-        </a>
-        <a href="[https://www.facebook.com/nori.desing](https://www.facebook.com/nori.desing)?" target="_blank" class="btn-main btn-facebook">
-            <div class="btn-icon">📱</div>
-            <span>ติดต่อสอบถาม / สั่งงาน</span>
-        </a>
-    </div>
-
-    <!-- ลิงก์เพลงจาก GitHub -->
-    <audio id="bg-music" loop preload="auto">
-        <source src="[https://raw.githubusercontent.com/Nori-beep/Nesszy/main/bgm.mp3](https://raw.githubusercontent.com/Nori-beep/Nesszy/main/bgm.mp3)" type="audio/mpeg">
-    </audio>
-    <button id="music-btn" class="music-toggle">🔇</button>
-
+    <!-- สคริปต์สำหรับคุมการเปิด-ปิดเพลง -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const reveals = document.querySelectorAll('.reveal');
-            const revealOnScroll = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                        observer.unobserve(entry.target);
+            const music = document.getElementById('bgMusic');
+            const musicBtn = document.getElementById('musicToggleBtn');
+
+            // ตั้งระดับเสียงให้เบาๆ ฟังสบายๆ (0.0 ถึง 1.0)
+            music.volume = 0.4;
+
+            musicBtn.addEventListener('click', async () => {
+                try {
+                    if (music.paused) {
+                        // ใช้ Promise แจ้งเบราว์เซอร์ว่าเป็นการกระทำจากผู้ใช้
+                        await music.play();
+                        musicBtn.classList.add('playing'); // เริ่มหมุน
+                    } else {
+                        music.pause();
+                        musicBtn.classList.remove('playing'); // หยุดหมุน
                     }
-                });
-            }, { threshold: 0.1 });
-            reveals.forEach(reveal => revealOnScroll.observe(reveal));
-
-            const createSparkles = () => {
-                const container = document.createElement('div');
-                container.className = 'sparkle-container';
-                document.body.appendChild(container);
-                for (let i = 0; i < 25; i++) {
-                    const sparkle = document.createElement('div');
-                    sparkle.className = 'sparkle';
-                    sparkle.innerHTML = '✨';
-                    sparkle.style.left = Math.random() * 100 + 'vw';
-                    sparkle.style.top = Math.random() * 100 + 'vh';
-                    sparkle.style.fontSize = (Math.random() * 1 + 0.6) + 'rem';
-                    sparkle.style.animationDuration = (Math.random() * 3 + 2.5) + 's'; 
-                    sparkle.style.animationDelay = (Math.random() * 5) + 's';
-                    container.appendChild(sparkle);
+                } catch (err) {
+                    console.error("ไม่สามารถเล่นเพลงได้ เนื่องจากนโยบายเบราว์เซอร์:", err);
+                    // หากโดนบล็อก ให้ลบสถานะหมุนออก
+                    musicBtn.classList.remove('playing');
                 }
-            };
-            createSparkles();
-
-            const bgMusic = document.getElementById('bg-music');
-            const musicBtn = document.getElementById('music-btn');
-            let isPlaying = false;
-            bgMusic.volume = 0.4; 
-
-            const startAudio = () => {
-                if (!isPlaying) {
-                    bgMusic.play().then(() => {
-                        musicBtn.innerHTML = '🎵';
-                        musicBtn.classList.add('music-playing');
-                        isPlaying = true;
-                        window.removeEventListener('click', startAudio);
-                        window.removeEventListener('touchstart', startAudio);
-                        window.removeEventListener('scroll', startAudio);
-                    }).catch(e => console.log("Autoplay blocked. Interaction needed."));
-                }
-            };
-
-            window.addEventListener('click', startAudio);
-            window.addEventListener('touchstart', startAudio);
-            window.addEventListener('scroll', startAudio);
-
-            musicBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (isPlaying) {
-                    bgMusic.pause();
-                    musicBtn.innerHTML = '🔇';
-                    musicBtn.classList.remove('music-playing');
-                } else {
-                    bgMusic.play().catch(e => console.log(e));
-                    musicBtn.innerHTML = '🎵';
-                    musicBtn.classList.add('music-playing');
-                }
-                isPlaying = !isPlaying;
             });
         });
     </script>
 </body>
 </html>
-
-```
